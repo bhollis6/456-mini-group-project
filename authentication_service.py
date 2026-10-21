@@ -10,7 +10,7 @@ MONITOR_HOST = "127.0.0.1"
 MONITOR_PORT = 9999
 AUTH_HOST = "0.0.0.0"
 AUTH_PORT = 8080
-T = 1.0  # 1 second frequency for heartbeat period
+T = 5  # 5 second frequency for heartbeat period
 N = 3  # 3 missed beats for timeout
 SECRET = b"cs456-minigroup1-secret"
 
