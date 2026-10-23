@@ -14,7 +14,7 @@ def log(msg: str) -> None:
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_socket.bind((UDP_IP, PORT))
-server_socket.settimeout(T)
+server_socket.settimeout(T + 1.0)
 last_beat = None
 
 log(f"Heartbeat monitor started on {UDP_IP}:{PORT}....")
