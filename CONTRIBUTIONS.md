@@ -2,12 +2,14 @@
 
 Member: Alexa Tchakar 
 Files: authentication_service.py
--Implemented the authentication/ticket service using TCP listener 
--Validated credentials and issued tokens
--Implemented hmac signed heartbeats each T seconds 
+- Implemented the authentication/ticket service using TCP listener 
+- Validated credentials and issued tokens
+- Implemented hmac signed heartbeats each T seconds 
 
-Member:
-Files:
+Member: Adrian Mancinas Ponce
+Files: monitor.py
+- Implemented the first version of the heartbeat monitor, making sure the logic flows well with the critical service
+- Fixed a bug causing false socket timeout to appear by increasing the timeout interval by a second to reduce any false positives.
 
 Member:
 Files:
