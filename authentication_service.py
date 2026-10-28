@@ -4,6 +4,7 @@ import socket
 import random
 import threading
 import hmac
+import json
 
 # For Task 2, we chose the Authentication/Ticket Service for our security domain
 MONITOR_HOST = "127.0.0.1"
@@ -13,6 +14,9 @@ AUTH_PORT = 8080
 T = 5  # 5 second frequency for heartbeat period
 N = 3  # 3 missed beats for timeout
 SECRET = b"cs456-minigroup1-secret"
+
+# Session tracking
+ACTIVE_SESSIONS = {}
 
 # Dummy credentials
 USERS = {
@@ -32,6 +36,25 @@ def log(msg: str) -> None:
     ts = time.strftime("%H:%M:%S")
     print(f"[auth {ts}] {msg}", flush=True)
 
+# State Checkpointing
+def save_checkpoint() -> None:
+    try:
+        with open("checkpoint.json", "w") as f:
+            json.dump(ACTIVE_SESSIONS, f)
+        log(f"Checkpoint saved. There are({len(ACTIVE_SESSIONS)} active sessions)")
+    except Exception:
+        log("Error saving checkpoint")
+
+def load_checkpoint() -> None:
+    global ACTIVE_SESSIONS
+    if os.path.exists("checkpoint.json"):
+        try:
+            with open("checkpoint.json", "r") as f:
+                ACTIVE_SESSIONS = json.load(f)
+            log(f"Loaded existing checkpoint with ({len(ACTIVE_SESSIONS)} sessions)")
+        except Exception:
+            log("Error loading checkpoint")
+
 # Building the hearbeat
 def make_heartbeat(seq: int) -> bytes:
     ts = str(int(time.time() * 1000))  # timestamp in milliseconds
@@ -47,6 +70,7 @@ def send_heartbeat(stop_event: threading.Event) -> None:
         sequence += 1
         sock.sendto(make_heartbeat(sequence), (MONITOR_HOST, MONITOR_PORT))
         log(f"beat {MONITOR_HOST}:{MONITOR_PORT} seq={sequence}")
+        save_checkpoint()
         stop_event.wait(T)
     sock.close()
 
@@ -75,6 +99,7 @@ def validate_client(conn: socket.socket, address) -> None:
         _, user, password = splitting_request
         if USERS.get(user) == password:
             token = f"token-{user}-{random.randint(1000, 9999)}"
+            ACTIVE_SESSIONS[token] = user
             conn.sendall(f"SUCCESS {token}\n".encode())
             log(f"LOGIN {user} SUCCESS! ({token})")
         else:
@@ -87,6 +112,7 @@ def validate_client(conn: socket.socket, address) -> None:
 
 
 def main() -> None:
+    load_checkpoint()
     stop_event = threading.Event()
     threading.Thread(target=send_heartbeat, args=(
         stop_event,), daemon=True).start()
