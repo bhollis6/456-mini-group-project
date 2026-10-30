@@ -63,7 +63,8 @@ while True:
                 log("WARNING: Heartbeat MAC verification failed (Possible spoofing attempt)!")
 
         elif decoded_data[0] == "ACTIVATED":
-            log("Valid ACTIVATED response received! Resuming normal operations.")
+            activated_acknowledgement = time.strftime("%Y-%m-%d %H:%M:%S")
+            log(f"Valid ACTIVATED response received at {activated_acknowledgement}. Resuming normal operations.")
             last_beat = time.time()
             awaiting_failover = False
 
