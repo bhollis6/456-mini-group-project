@@ -1,10 +1,14 @@
 #The following CONTRIBUTIONS.md lists each team member's specific contributions to the service, monitor, security audit, and video demo.
 
 Member: Alexa Tchakar 
-Files: authentication_service.py
+Files: authentication_service.py, standby_service.py, adversary.py
+- Part 1:
 - Implemented the authentication/ticket service using TCP listener 
 - Validated credentials and issued tokens
 - Implemented hmac signed heartbeats each T seconds 
+- Part 2:
+- Implemented passive redundancy node which listens on port 9998, loads checkpoint upon failover and takes over port 8080
+- Developed attack scenario 1 induced failover in adversary.py to spoof crash to simulate split brain 
 
 Member: Adrian Mancinas Ponce
 Files: monitor.py
@@ -23,7 +27,6 @@ Files: adversary.py
 - Performed a complete audit of the PDF before the final submission.
 - Ensured all video requirements were met as the demo was being recorded.
   
-
 
 Whole Team:
 -General debugging on each of the files
