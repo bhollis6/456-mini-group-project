@@ -33,11 +33,9 @@ RANDOM_PROB_REQ = 0.0
 BACKGROUND_FAULT_TRIG = 0.0
 
 # Timestamps and log
-
-
 def log(msg: str) -> None:
     ts = time.strftime("%H:%M:%S")
-    print(f"[auth {ts}] {msg}", flush=True)
+    print(f"[standby {ts}] {msg}", flush=True)
 
 
 # State Checkpointing
@@ -62,8 +60,6 @@ def load_checkpoint() -> None:
             log("Error loading checkpoint")
 
 # Building the hearbeat
-
-
 def make_heartbeat(seq: int) -> bytes:
     ts = str(int(time.time() * 1000))  # timestamp in milliseconds
     message = f"{seq}|{ts}".encode()
@@ -71,8 +67,6 @@ def make_heartbeat(seq: int) -> bytes:
     return message + b"|" + mac.encode()
 
 # Sending the hearbeats
-
-
 def send_heartbeat(stop_event: threading.Event) -> None:
     sequence = 0
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -85,8 +79,6 @@ def send_heartbeat(stop_event: threading.Event) -> None:
     sock.close()
 
 # Fault injection thread
-
-
 def fault_injection() -> None:
     while True:
         time.sleep(0.5)
@@ -95,8 +87,6 @@ def fault_injection() -> None:
             os._exit(1)  # terminating completely
 
 # Validation and simulated failure
-
-
 def validate_client(conn: socket.socket, address) -> None:
     try:
         data = conn.recv(1024).decode(errors="ignore").strip()
@@ -105,8 +95,22 @@ def validate_client(conn: socket.socket, address) -> None:
         if random.random() < RANDOM_PROB_REQ:
             log("Crash on request!")
             os._exit(1)
+
         # Splitting client request
-        splitting_request = data.split(maxsplit=2)
+        splitting_request = data.split()
+        if not splitting_request:
+            return
+
+        if splitting_request[0] == "VERIFY" and len(splitting_request) == 2:
+            token = splitting_request[1]
+            if token in ACTIVE_SESSIONS:
+                conn.sendall(f"VALID {ACTIVE_SESSIONS[token]}\n".encode())
+                log(f"VERIFY {token} SUCCESS for user {ACTIVE_SESSIONS[token]}")
+            else:
+                conn.sendall(b"INVALID session\n")
+                log(f"VERIFY {token} INVALID")
+            return
+
         if len(splitting_request) != 3 or splitting_request[0] != "LOGIN":
             conn.sendall(b"FAILURE! Bad request.\n")
             return

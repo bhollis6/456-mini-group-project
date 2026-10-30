@@ -1,4 +1,5 @@
 import socket
+import sys
 
 # Connect to running authentication service
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -13,10 +14,16 @@ USERS = {
     "jackson": "pass_jackson"
 }
 
-# Send login request with one of the dummy credentials
-s.sendall(b"LOGIN admin pass_admin\n")
-response = s.recv(1024).decode().strip()
-s.close()
-
-print(f"Server response: {response}\n")
-print("Success! session will populate in checkpoint.json")
+if len(sys.argv) >= 3 and sys.argv[1].lower() == "verify":
+    token = sys.argv[2]
+    s.sendall(f"VERIFY {token}\n".encode())
+    response = s.recv(1024).decode().strip()
+    s.close()
+    print(f"Server response: {response}")
+else:
+    # Send login request with one of the dummy credentials
+    s.sendall(b"LOGIN admin pass_admin\n")
+    response = s.recv(1024).decode().strip()
+    s.close()
+    print(f"Server response: {response}\n")
+    print("Success! session will populate in checkpoint.json")
