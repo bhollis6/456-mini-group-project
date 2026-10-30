@@ -91,8 +91,22 @@ def validate_client(conn: socket.socket, address) -> None:
         if random.random() < RANDOM_PROB_REQ:
             log("Crash on request!")
             os._exit(1)
+
         # Splitting client request
-        splitting_request = data.split(maxsplit=2)
+        splitting_request = data.split()
+        if not splitting_request:
+            return
+
+        if splitting_request[0] == "VERIFY" and len(splitting_request) == 2:
+            token = splitting_request[1]
+            if token in ACTIVE_SESSIONS:
+                conn.sendall(f"VALID {ACTIVE_SESSIONS[token]}\n".encode())
+                log(f"VERIFY {token} SUCCESS for user {ACTIVE_SESSIONS[token]}")
+            else:
+                conn.sendall(b"INVALID session\n")
+                log(f"VERIFY {token} INVALID")
+            return
+
         if len(splitting_request) != 3 or splitting_request[0] != "LOGIN":
             conn.sendall(b"FAILURE! Bad request.\n")
             return
