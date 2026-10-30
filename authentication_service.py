@@ -100,6 +100,7 @@ def validate_client(conn: socket.socket, address) -> None:
         if USERS.get(user) == password:
             token = f"token-{user}-{random.randint(1000, 9999)}"
             ACTIVE_SESSIONS[token] = user
+            save_checkpoint()
             conn.sendall(f"SUCCESS {token}\n".encode())
             log(f"LOGIN {user} SUCCESS! ({token})")
         else:
