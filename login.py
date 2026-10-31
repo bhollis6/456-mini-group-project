@@ -25,5 +25,8 @@ else:
     s.sendall(b"LOGIN admin pass_admin\n")
     response = s.recv(1024).decode().strip()
     s.close()
-    print(f"Server response: {response}\n")
-    print("Success! session will populate in checkpoint.json")
+    print(f"Server response: {response}")
+    if response.startswith("SUCCESS"):
+        print("Login succeeded. Session saved to checkpoint.json")
+    else:
+        print("Login failed.")
