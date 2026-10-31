@@ -1,11 +1,11 @@
-import socket 
+import socket
 import hmac
 import time
 
 UDP_IP = "127.0.0.1"
 PORT = 9999
-T = 5 # 5 second frequency for heartbeat period
-N = 3 # 3 missed beats for timeout
+T = 5  # 5 second frequency for heartbeat period
+N = 3  # 3 missed beats for timeout
 SECRET = b"cs456-minigroup1-secret"
 
 # Left it here just in case
@@ -49,7 +49,7 @@ def main() -> None:
                 decoded_data = data.decode().split("|")
             except Exception as e:
                 log(f"Malformed packet from {client_address}: {e}")
-                continue # discard malformed packet and wait for the next datagram
+                continue  # discard malformed packet and wait for the next datagram
 
             if len(decoded_data) == 3:
                 seq_str, ts_str, received_mac = decoded_data
@@ -65,7 +65,7 @@ def main() -> None:
 
             elif decoded_data[0] == "ACTIVATED":
                 activated_acknowledgement = time.strftime("%Y-%m-%d %H:%M:%S")
-                log(f"Valid ACTIVATED response received at {activated_acknowledgement}. Resuming normal operations.")
+                log(f"[Service Restored] Valid ACTIVATED response received at {activated_acknowledgement}. Resuming normal operations.")
                 last_beat = time.time()
                 awaiting_failover = False
 
@@ -74,7 +74,7 @@ def main() -> None:
 
         except socket.timeout:
             if last_beat is None:
-                continue # We haven't received the very first heartbeat yet. Keep waiting and don't count as a miss.
+                continue  # We haven't received the very first heartbeat yet. Keep waiting and don't count as a miss.
             time_since_last_beat = time.time() - last_beat
             missed_beats = int(time_since_last_beat // T)
 
@@ -83,7 +83,7 @@ def main() -> None:
 
                 if not awaiting_failover:
 
-                    log(f"CRITICAL: Auth Service is Down! Missed {missed_beats} consecutive beats in {T * missed_beats} seconds! Occurred at {error_occurrence_time}.")
+                    log(f"[Crash Detected] CRITICAL: Auth Service is Down! Missed {missed_beats} consecutive beats in {T * missed_beats} seconds! Occurred at {error_occurrence_time}.")
                     with open("error.txt", "a") as f:
                         f.write(f"ERROR: Auth Service went silent on {error_occurrence_time}\n")
 
@@ -91,9 +91,9 @@ def main() -> None:
 
                     packet_sent_time = time.strftime("%Y-%m-%d %H:%M:%S")
                     payload_message = send_payload("SERVICE_CRASHED", SECRET)
-                    server_socket.sendto(payload_message, (UDP_IP, 9998)) 
+                    server_socket.sendto(payload_message, (UDP_IP, 9998))
 
-                    log(f"Promotional signal has been sent to the failover process at {packet_sent_time}. Waiting for confirmation.")
+                    log(f"[Failover Triggered] Promotional signal has been sent to the failover process at {packet_sent_time}. Waiting for confirmation.")
 
             else:
                 log(f"WARNING: Missed {missed_beats} beat(s)")
