@@ -22,11 +22,21 @@ Files: adversary.py
 - Created repository and edited video.
 
 Member: Jackson Reed
+
+Part 1:
 Files: adversary.py
 - Looked at the code in adversary.py after Braden wrote it to ensure its usability
 - Performed a complete audit of the PDF before the final submission.
 - Ensured all video requirements were met as the demo was being recorded.
-  
+
+Part 2:
+Files: adversary.py, monitor.py, login.py
+- Added attack scenario 2 (tampered/corrupted checkpoint) in adversary.py: a tamper mode that injects a forged session into checkpoint.json and a corrupt mode that invalidates it
+- Added a dropped-heartbeat variant of attack scenario 1 (delay) that freezes the primary with SIGSTOP to force a false failover while the primary stays alive
+- Added the [Crash Detected] -> [Failover Triggered] -> [Service Restored] log markers in monitor.py (Task 3)
+- Fixed login.py to report a failed login instead of always printing success
+- Ran the adversarial test suite and wrote the Adversarial Audit Summary section of the report
+- Performed a final audit of report document and demo video
 
 Whole Team:
 -General debugging on each of the files
