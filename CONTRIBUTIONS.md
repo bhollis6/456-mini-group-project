@@ -16,10 +16,15 @@ Files: monitor.py
 - Fixed a bug causing false socket timeout to appear by increasing the timeout interval by a second to reduce any false positives.
 
 Member: Braden Hollis
-Files: adversary.py
+Files: adversary.py, monitor.py, authentication_service.py, login.py, standby_service.py
+- Part 1:
 - Coded adversary.py.
-- Reviewed and fixed bugs in monitor.py and authentication_service.py
+- Reviewed and fixed bugs in monitor.py and authentication_service.py.
 - Created repository and edited video.
+- Part 2:
+- Added state checkpointing.
+- Reviewed and fixed bugs in monitor.py, authentication_service.py, login.py, standby_service.py.
+- Created a simple login.py for the demo.
 
 Member: Jackson Reed
 
