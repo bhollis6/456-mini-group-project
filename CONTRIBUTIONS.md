@@ -17,11 +17,13 @@ Files: monitor.py
 
 Member: Braden Hollis
 Files: adversary.py, monitor.py, authentication_service.py, login.py, standby_service.py
-- Part 1:
+
+Part 1:
 - Coded adversary.py.
 - Reviewed and fixed bugs in monitor.py and authentication_service.py.
 - Created repository and edited video.
-- Part 2:
+  
+Part 2:
 - Added state checkpointing.
 - Reviewed and fixed bugs in monitor.py, authentication_service.py, login.py, standby_service.py.
 - Created a simple login.py for the demo.
