@@ -11,22 +11,49 @@ Files: authentication_service.py, standby_service.py, adversary.py
 - Developed attack scenario 1 induced failover in adversary.py to spoof crash to simulate split brain 
 
 Member: Adrian Mancinas Ponce
-Files: monitor.py
+
+Part 1:
+
+- Files: monitor.py
 - Implemented the first version of the heartbeat monitor, making sure the logic flows well with the critical service
 - Fixed a bug causing false socket timeout to appear by increasing the timeout interval by a second to reduce any false positives.
 
+Part 2:
+- Files: monitor.py, adversary.py
+- Implemented the ability for the monitor to send the signal to the standby service when main service crashes
+- Improved the readability of the code in monitor.py
+- Gave advice for a code potentially not functioning properly in a PR in adversary.py
+- Helped record a video and provide a clip that was missing
+
 Member: Braden Hollis
-Files: adversary.py
+Files: adversary.py, monitor.py, authentication_service.py, login.py, standby_service.py
+
+Part 1:
 - Coded adversary.py.
-- Reviewed and fixed bugs in monitor.py and authentication_service.py
+- Reviewed and fixed bugs in monitor.py and authentication_service.py.
 - Created repository and edited video.
+  
+Part 2:
+- Added state checkpointing.
+- Reviewed and fixed bugs in monitor.py, authentication_service.py, login.py, standby_service.py.
+- Created a simple login.py for the demo.
 
 Member: Jackson Reed
+
+Part 1:
 Files: adversary.py
 - Looked at the code in adversary.py after Braden wrote it to ensure its usability
 - Performed a complete audit of the PDF before the final submission.
 - Ensured all video requirements were met as the demo was being recorded.
-  
+
+Part 2:
+Files: adversary.py, monitor.py, login.py
+- Added attack scenario 2 (tampered/corrupted checkpoint) in adversary.py: a tamper mode that injects a forged session into checkpoint.json and a corrupt mode that invalidates it
+- Added a dropped-heartbeat variant of attack scenario 1 (delay) that freezes the primary with SIGSTOP to force a false failover while the primary stays alive
+- Added the [Crash Detected] -> [Failover Triggered] -> [Service Restored] log markers in monitor.py (Task 3)
+- Fixed login.py to report a failed login instead of always printing success
+- Ran the adversarial test suite and wrote the Adversarial Audit Summary section of the report
+- Performed a final audit of report document and demo video
 
 Whole Team:
 -General debugging on each of the files
