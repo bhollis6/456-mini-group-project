@@ -11,9 +11,16 @@ Files: authentication_service.py, standby_service.py, adversary.py
 - Developed attack scenario 1 induced failover in adversary.py to spoof crash to simulate split brain 
 
 Member: Adrian Mancinas Ponce
+Part 1:
 Files: monitor.py
 - Implemented the first version of the heartbeat monitor, making sure the logic flows well with the critical service
 - Fixed a bug causing false socket timeout to appear by increasing the timeout interval by a second to reduce any false positives.
+Part 2:
+Files: monitor.py, adversary.py
+- Implemented the ability for the monitor to send the signal to the standby service when main service crashes
+- Improved the readability of the code in monitor.py
+- Gave advice for a code potentially not functioning properly in a PR in adversary.py
+- Helped record a video and provide a clip that was missing
 
 Member: Braden Hollis
 Files: adversary.py, monitor.py, authentication_service.py, login.py, standby_service.py
